@@ -98,7 +98,24 @@ export async function getSessions() {
 }
 
 export async function getSessionById(sessionId) {
-  return fetchJson(`${API_BASE}/api/sessions/${encodeURIComponent(sessionId)}`);
+  const session = await fetchJson(
+    `${API_BASE}/api/sessions/${encodeURIComponent(sessionId)}`
+  );
+
+  const overrides = readOverrides();
+  const o = overrides[session.sessionId];
+
+  if (!o) return session;
+
+  return {
+    ...session,
+    severity: o.severity,
+    override: {
+      severity: o.severity,
+      comment: o.comment || "",
+      updatedAt: o.updatedAt,
+    },
+  };
 }
 
 // ---------------------------
