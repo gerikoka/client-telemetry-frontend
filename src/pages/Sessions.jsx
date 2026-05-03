@@ -6,6 +6,7 @@ import { getSessions } from "../api/dashboardApi";
 export default function Sessions() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
+  const [severityFilter, setSeverityFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
@@ -56,6 +57,26 @@ export default function Sessions() {
     { LOW: 0, MEDIUM: 0, HIGH: 0, TOTAL: 0 }
   );
 
+  function pct(count) {
+    if (!labelCounts.TOTAL) return "0.0";
+    return ((count / labelCounts.TOTAL) * 100).toFixed(1);
+  }
+
+  const filteredRows =
+    severityFilter === "ALL"
+      ? rows
+      : rows.filter((s) => String(s.severity || "").toUpperCase() === severityFilter);
+
+  function cardStyle(filterName) {
+    return {
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      padding: 12,
+      cursor: "pointer",
+      backgroundColor: severityFilter === filterName ? "#f5f5f5" : "white",
+    };
+  }
+
   return (
     <div>
       <h2>Session Overview</h2>
@@ -68,25 +89,39 @@ export default function Sessions() {
           marginBottom: 18,
         }}
       >
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
+        <div style={cardStyle("ALL")} onClick={() => setSeverityFilter("ALL")}>
           <div style={{ opacity: 0.7 }}>Total Sessions</div>
           <b style={{ fontSize: 22 }}>{labelCounts.TOTAL}</b>
+          <div style={{ fontSize: 13, color: "#666" }}>All sessions</div>
         </div>
 
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
+        <div style={cardStyle("LOW")} onClick={() => setSeverityFilter("LOW")}>
           <div style={{ opacity: 0.7 }}>Low Severity</div>
           <b style={{ fontSize: 22 }}>{labelCounts.LOW}</b>
+          <div style={{ fontSize: 13, color: "#666" }}>{pct(labelCounts.LOW)}%</div>
         </div>
 
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
+        <div style={cardStyle("MEDIUM")} onClick={() => setSeverityFilter("MEDIUM")}>
           <div style={{ opacity: 0.7 }}>Medium Severity</div>
           <b style={{ fontSize: 22 }}>{labelCounts.MEDIUM}</b>
+          <div style={{ fontSize: 13, color: "#666" }}>{pct(labelCounts.MEDIUM)}%</div>
         </div>
 
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
+        <div style={cardStyle("HIGH")} onClick={() => setSeverityFilter("HIGH")}>
           <div style={{ opacity: 0.7 }}>High Severity</div>
           <b style={{ fontSize: 22 }}>{labelCounts.HIGH}</b>
+          <div style={{ fontSize: 13, color: "#666" }}>{pct(labelCounts.HIGH)}%</div>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 10, opacity: 0.75 }}>
+        Showing <b>{filteredRows.length}</b> of <b>{rows.length}</b> sessions
+        {severityFilter !== "ALL" ? (
+          <>
+            {" "}
+            filtered by <b>{severityFilter}</b> severity
+          </>
+        ) : null}
       </div>
 
       <table width="100%" cellPadding="10" style={{ borderCollapse: "collapse" }}>
@@ -103,7 +138,7 @@ export default function Sessions() {
         </thead>
 
         <tbody>
-          {rows.map((s) => (
+          {filteredRows.map((s) => (
             <tr
               key={s.sessionId}
               style={{ borderBottom: "1px solid #eee", cursor: "pointer" }}
