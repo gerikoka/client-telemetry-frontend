@@ -36,7 +36,7 @@ export default function Queue() {
       <div>
         <h2>Queue & Agent Selection</h2>
         <p>
-          Prioritized sessions sorted by <b>severity</b> then <b>timestamp</b>.
+          <b>ONGOING</b> sessions are prioritized first, followed by <b>severity</b> level and <b>timestamp</b>.
         </p>
         <div style={{ opacity: 0.7 }}>
           No sessions available for prioritization.
@@ -48,7 +48,7 @@ export default function Queue() {
   return (
     <div>
       <h2>Queue & Agent Selection</h2>
-      <p>Prioritized sessions sorted by <b>severity</b> then <b>timestamp</b>.</p>
+      <p><b>ONGOING</b> sessions are prioritized first, followed by <b>severity</b> level and <b>timestamp</b>.</p>
 
       <QueueTable rows={rows} />
     </div>

@@ -4,6 +4,14 @@ import SeverityBadge from "./SeverityBadge";
 export default function QueueTable({ rows = [] }) {
   const navigate = useNavigate();
 
+  if (!rows.length) {
+    return (
+      <div style={{ opacity: 0.7 }}>
+        No sessions currently in queue.
+      </div>
+    );
+  }
+
   return (
     <table style={{ width: "100%", borderCollapse: "collapse" }}>
       <thead>
@@ -13,6 +21,7 @@ export default function QueueTable({ rows = [] }) {
           <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Scenario</th>
           <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Score</th>
           <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Severity</th>
+          <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Status</th>
           <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Timestamp</th>
           <th style={{ padding: "10px 8px", borderBottom: "1px solid #ddd" }}>Action</th>
         </tr>
@@ -40,11 +49,17 @@ export default function QueueTable({ rows = [] }) {
             </td>
 
             <td style={{ padding: "10px 8px", borderBottom: "1px solid #eee" }}>
-              {typeof r.score === "number" ? r.score : r.frustrationScore ?? "—"}
+              {typeof r.score === "number"
+                ? r.score
+                : r.frustrationScore ?? "—"}
             </td>
 
             <td style={{ padding: "10px 8px", borderBottom: "1px solid #eee" }}>
               <SeverityBadge severity={r.severity} />
+            </td>
+
+            <td style={{ padding: "10px 8px", borderBottom: "1px solid #eee" }}>
+              <b>{r.status || "—"}</b>
             </td>
 
             <td style={{ padding: "10px 8px", borderBottom: "1px solid #eee" }}>

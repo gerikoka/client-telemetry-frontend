@@ -60,18 +60,6 @@ function applyOverridesToSessions(sessions) {
   });
 }
 
-function severityRank(sev) {
-  switch (sev) {
-    case "HIGH":
-      return 0;
-    case "MEDIUM":
-      return 1;
-    case "LOW":
-    default:
-      return 2;
-  }
-}
-
 // ---------------------------
 // Fetch helper
 // ---------------------------
@@ -129,35 +117,18 @@ export async function getAlerts() {
 }
 
 // ---------------------------
-// Queue (priority sorted)
+// Queue
+// Uses backend ordering:
+// ONGOING first -> severity -> timestamp
 // ---------------------------
 export async function getQueue() {
-  const sessions = await getSessions();
-
-  const sorted = [...sessions].sort((a, b) => {
-    const sr = severityRank(a.severity) - severityRank(b.severity);
-    if (sr !== 0) return sr;
-
-    const ta = a.timestamp
-      ? new Date(a.timestamp).getTime()
-      : Number.MAX_SAFE_INTEGER;
-
-    const tb = b.timestamp
-      ? new Date(b.timestamp).getTime()
-      : Number.MAX_SAFE_INTEGER;
-
-    return ta - tb;
-  });
-
-  return sorted.map((s, idx) => ({
-    ...s,
-    queuePosition: idx + 1,
-  }));
+  const queue = await fetchJson(`${API_BASE}/api/queue`);
+  return applyOverridesToSessions(queue);
 }
 
 // ---------------------------
 // Session Detail Metrics
-// (now coming from backend)
+// (coming from backend)
 // ---------------------------
 export async function getSessionAggregates(sessionId) {
   return fetchJson(
